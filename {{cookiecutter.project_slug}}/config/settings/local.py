@@ -90,8 +90,6 @@ WEBPACK_LOADER = {
         'STATS_FILE': str(REACT_DIR.path('webpack-stats.dev.json')),
     }
 }
-{%- endif %}
-
-
+{% endif %}
 # Your local stuff: Below this line define 3rd party library settings
 # ------------------------------------------------------------------------------
