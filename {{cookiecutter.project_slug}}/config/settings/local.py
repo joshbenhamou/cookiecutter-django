@@ -79,7 +79,19 @@ INSTALLED_APPS += ['django_extensions']  # noqa F405
 # ------------------------------------------------------------------------------
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#std:setting-task_always_eager
 CELERY_ALWAYS_EAGER = True
-
+########## END CELERY
 {%- endif %}
-# Your stuff...
+
+{% if cookiecutter.js_task_runner == 'CreateReactApp' %}
+# Integrate React with Django
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'BUNDLE_DIR_NAME': 'bundles/',
+        'STATS_FILE': str(REACT_DIR.path('webpack-stats.dev.json')),
+    }
+}
+{%- endif %}
+
+
+# Your local stuff: Below this line define 3rd party library settings
 # ------------------------------------------------------------------------------

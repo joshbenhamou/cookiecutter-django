@@ -97,10 +97,66 @@ def append_to_project_gitignore(path):
         gitignore_file.write(path)
         gitignore_file.write(os.linesep)
 
-
 def generate_random_string(
     length, using_digits=False, using_ascii_letters=False, using_punctuation=False
 ):
+
+def remove_react_files():
+    """
+    Removes files needed for create-react-app if it isn't going to be used
+    """
+    cra_dir_location = os.path.join(PROJECT_DIRECTORY, 'frontend/')
+    if os.path.exists(cra_dir_location):
+        shutil.rmtree(cra_dir_location)
+
+    bundles_dir_location = os.path.join(
+        PROJECT_DIRECTORY,
+        '{{ cookiecutter.project_slug }}',
+        'bundles/'
+    )
+    if os.path.exists(bundles_dir_location):
+        shutil.rmtree(bundles_dir_location)
+
+    for filename in ["index.html", "react-base.html"]:
+        file_path = os.path.join(
+            PROJECT_DIRECTORY,
+            '{{ cookiecutter.project_slug }}',
+            'templates',
+            filename,
+        )
+        os.remove(file_path)
+
+
+def remove_static_dirs():
+    """
+    Removes static files not needed for create-react-app
+    """
+    static_dir_location = os.path.join(
+        PROJECT_DIRECTORY,
+        '{{ cookiecutter.project_slug }}',
+        'static',
+    )
+    for static_asset in ['css', 'fonts', 'images', 'js', 'sass']:
+        static_asset_dir = os.path.join(static_dir_location, static_asset)
+        if os.path.exists(static_asset_dir):
+            shutil.rmtree(static_asset_dir)
+
+    template_dir_location = os.path.join(
+        PROJECT_DIRECTORY,
+        '{{ cookiecutter.project_slug }}',
+        'templates',
+    )
+    for template_sub_dir in ['account', 'bootstrap4', 'pages', 'users']:
+        template_dir = os.path.join(template_dir_location, template_sub_dir)
+        if os.path.exists(template_dir):
+            shutil.rmtree(template_dir)
+
+    for filename in ["403_csrf.html", "404.html", "500.html", "base.html"]:
+        file_path = os.path.join(template_dir_location, filename)
+        os.remove(file_path)
+
+
+def remove_packageJSON_file():
     """
     Example:
         opting out for 50 symbol-long, [a-z][A-Z][0-9] string
@@ -165,9 +221,82 @@ def set_django_admin_url(file_path):
     )
     return django_admin_url
 
-
 def generate_postgres_user():
     return generate_random_string(length=32, using_ascii_letters=True)
+
+def remove_open_source_files():
+    """
+    Removes files conventional to opensource projects only.
+    """
+    for filename in ["CONTRIBUTORS.txt"]:
+        os.remove(os.path.join(
+            PROJECT_DIRECTORY, filename
+        ))
+
+
+# IN PROGRESS
+# def copy_doc_files(project_directory):
+#     cookiecutters_dir = DEFAULT_CONFIG['cookiecutters_dir']
+#     cookiecutter_django_dir = os.path.join(
+#         cookiecutters_dir,
+#         'cookiecutter-django',
+#         'docs'
+#     )
+#     target_dir = os.path.join(
+#         project_directory,
+#         'docs'
+#     )
+#     for name in os.listdir(cookiecutter_django_dir):
+#         if name.endswith('.rst') and not name.startswith('index'):
+#             src = os.path.join(cookiecutter_django_dir, name)
+#             dst = os.path.join(target_dir, name)
+#             shutil.copyfile(src, dst)
+
+# Generates and saves random secret key
+make_secret_key(PROJECT_DIRECTORY)
+
+# Removes the taskapp if celery isn't going to be used
+if '{{ cookiecutter.use_celery }}'.lower() == 'n':
+    remove_task_app(PROJECT_DIRECTORY)
+
+# Removes the .idea directory if PyCharm isn't going to be used
+if '{{ cookiecutter.use_pycharm }}'.lower() != 'y':
+    remove_pycharm_dir(PROJECT_DIRECTORY)
+
+# Removes all heroku files if it isn't going to be used
+if '{{ cookiecutter.use_heroku }}'.lower() != 'y':
+    remove_heroku_files()
+
+# Removes all docker files if it isn't going to be used
+if '{{ cookiecutter.use_docker }}'.lower() != 'y':
+    remove_docker_files()
+
+# Removes all JS task manager files if it isn't going to be used
+if '{{ cookiecutter.js_task_runner}}'.lower() == 'gulp':
+    remove_grunt_files()
+    remove_react_files()
+elif '{{ cookiecutter.js_task_runner}}'.lower() == 'grunt':
+    remove_gulp_files()
+    remove_react_files()
+elif '{{ cookiecutter.js_task_runner}}'.lower() == 'createreactapp':
+    remove_gulp_files()
+    remove_grunt_files()
+    remove_static_dirs()
+    remove_packageJSON_file()
+else:
+    remove_gulp_files()
+    remove_grunt_files()
+    remove_react_files()
+    remove_packageJSON_file()
+
+# Display a warning if use_docker and use_grunt are selected. Grunt isn't
+#   supported by our docker config atm.
+if '{{ cookiecutter.js_task_runner }}'.lower() in ['grunt', 'gulp', 'createreactapp'] and '{{ cookiecutter.use_docker }}'.lower() == 'y':
+    print(
+        "You selected to use docker and a JS task runner. This is NOT supported out of the box for now. You "
+        "can continue to use the project like you normally would, but you will need to add a "
+        "js task runner service to your docker configuration manually."
+    )
 
 
 def set_postgres_user(file_path, value=None):

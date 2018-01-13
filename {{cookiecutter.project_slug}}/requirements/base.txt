@@ -25,6 +25,20 @@ django-compressor==2.2  # https://github.com/django-compressor/django-compressor
 {%- endif %}
 django-redis==4.9.0  # https://github.com/niwinz/django-redis
 
-# Django REST Framework
-djangorestframework==3.8.2  # https://github.com/encode/django-rest-framework
-coreapi==2.3.3  # https://github.com/core-api/python-client
+{% if cookiecutter.js_task_runner == "CreateReactApp" %}
+
+# Django REST APIs
+djangorestframework==3.8.2
+djangorestframework-jwt==1.11.0
+
+django-filter==1.1.0
+django-rest-auth==0.9.2
+
+coreapi==2.3.3  # For documenting API
+django-oauth-toolkit==0.12.0
+
+# This integrates webpack and Django
+django-webpack-loader==0.5.0
+{%- endif %}
+
+# Your custom requirements go here
