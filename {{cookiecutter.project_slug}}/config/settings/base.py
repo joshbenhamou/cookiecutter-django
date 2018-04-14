@@ -385,7 +385,7 @@ OAUTH2_PROVIDER = {
     },
     'ACCESS_TOKEN_EXPIRE_SECONDS': 31536000,  # Sets OAUTH access tokens good for a year
 }
-{%- endif %}
+{% endif %}
 
 # Your common stuff: Below this line define 3rd party library settings
 # ------------------------------------------------------------------------------
